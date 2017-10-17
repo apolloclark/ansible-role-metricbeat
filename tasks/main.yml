@@ -1,0 +1,56 @@
+---
+# http://docs.ansible.com/ansible/latest/set_fact_module.html
+- name: Merge metricbeat_default and metricbeat variables
+  set_fact:
+    metricbeat_combined: "{{ metricbeat_defaults | combine(metricbeat, recursive=True) }}"
+
+# https://www.elastic.co/guide/en/beats/metricbeat/current/setup-repositories.html
+# http://docs.ansible.com/ansible/latest/apt_key_module.html
+- name: Add repository key
+  apt_key:
+    url: "https://artifacts.elastic.co/GPG-KEY-elasticsearch"
+    id: "46095ACC8548582C1A2699A9D27D666CD88E42B4"
+    state: present
+
+# http://docs.ansible.com/ansible/latest/apt_repository_module.html
+- name: Add Server repository
+  apt_repository:
+    repo: 'deb https://artifacts.elastic.co/packages/5.x/apt stable main'
+    state: present
+
+- name: Update apt cache
+  apt: update_cache=yes
+
+- name: Install from repo (if choosing the latest version)
+  apt:
+    name: metricbeat
+    state: installed
+  when: "metricbeat_combined.version == 'latest'"
+
+- name: Get the platform (i386 or amd64) of the virtual machine
+  command: dpkg --print-architecture
+  register: print_architecture
+
+- name: And set the actual platform value as a variable
+  set_fact:
+    platform: "{{ print_architecture.stdout }}"
+
+- name: Download deb (if choosing a specific version)
+  get_url:
+    url={{ elastic_url }}/downloads/beats/metricbeat/metricbeat-{{ metricbeat_combined.version }}-{{ platform }}.deb
+    dest=/opt/metricbeat.deb
+  when: "metricbeat_combined.version != 'latest'"
+
+- name: Install from deb (if choosing a specific version)
+  apt: deb=/opt/metricbeat.deb
+  when: "metricbeat_combined.version != 'latest'"
+
+# http://docs.ansible.com/ansible/latest/template_module.html
+- name: Copy config file
+  template:
+    src: "metricbeat.yml"
+    dest: "{{ metricbeat_combined.config_include_dir }}/metricbeat.yml"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart metricbeat

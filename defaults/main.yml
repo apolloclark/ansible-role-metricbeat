@@ -1,0 +1,70 @@
+---
+# https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-overview.html
+# https://www.elastic.co/guide/en/beats/metricbeat/current/configuring-howto-metricbeat.html
+# https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-configuration-options.html
+elastic_url: "https://artifacts.elastic.co"
+
+# Overload variables using the dict named metricbeat
+metricbeat:
+  version: "latest"
+
+metricbeat_defaults:
+  deamon: "metricbeat"
+  version: "latest"
+  config_include_dir: "/etc/metricbeat/"
+
+  # https://www.elastic.co/guide/en/beats/metricbeat/current/configuration-general.html
+  name: ""
+  tags: ""
+  fields: ""
+  fields_under_root: "false"
+  queue_size: 1000
+  bulk_queue_size: 0
+  max_procs: ""
+
+  # https://www.elastic.co/guide/en/beats/metricbeat/current/configuring-howto-metricbeat.html
+  # https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-modules.html
+  modules:
+  # https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-system.html
+    system:
+      metricsets:
+        - cpu
+        - load
+        - core
+        - diskio
+        - filesystem
+        - fsstat
+        - memory
+        - network
+        - process
+        - socket
+      enabled: "true"
+      period: "10s"
+      processes: "['.*']"
+      cpu_ticks: "true"
+ 
+  output:
+    # https://www.elastic.co/guide/en/beats/metricbeat/current/elasticsearch-output.html
+    elasticsearch:
+      hosts: '["localhost:9200"]'
+      # protocol: "https"
+      # username: "elastic"
+      # password: "changeme"
+    # https://www.elastic.co/guide/en/beats/metricbeat/current/logstash-output.html
+    # logstash:
+      # hosts: '["localhost:9200"]'
+  
+  # https://www.elastic.co/guide/en/beats/metricbeat/current/configuration-logging.html
+  logging:
+    level: "info"
+    selectors: '["*"]'
+    to_syslog: "false"
+    to_files: "true"
+    files:
+      path: "/var/log/metricbeat"
+      name: "metricbeat.log"
+      rotateeverybytes: 10485760
+      keepfiles: 7
+    metrics:
+      enabled: "true"
+      period: "30s"

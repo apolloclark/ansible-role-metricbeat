@@ -1,0 +1,6 @@
+---
+- name: restart metricbeat
+  service:
+    name: "{{ metricbeat_combined.deamon }}"
+    state: restarted
+    sleep: 5

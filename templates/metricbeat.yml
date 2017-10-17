@@ -1,0 +1,146 @@
+###################### Metricbeat Configuration Example #######################
+
+# This file is an example configuration file highlighting only the most common
+# options. The metricbeat.full.yml file from the same directory contains all the
+# supported options with more comments. You can use it as a reference.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/metricbeat/index.html
+
+#
+#================================ General =====================================
+# 
+# https://www.elastic.co/guide/en/beats/metricbeat/current/configuration-general.html
+#
+
+# The name of the shipper that publishes the network data. It can be used to group
+# all the transactions sent by a single shipper in the web interface. Default
+# is the hostname.
+name: "{{ metricbeat_combined.name }}"
+
+# The tags of the shipper are included in their own field with each
+# transaction published.
+tags: "{{ metricbeat_combined.tags }}"
+
+# Optional fields that you can specify to add additional information to the
+# output.
+fields:
+{% for field in metricbeat_combined.fields %}
+  {{ field }}
+{% endfor %}
+
+
+
+
+
+#
+#==========================  Modules configuration ============================
+#
+# https://www.elastic.co/guide/en/beats/metricbeat/current/configuration-metricbeat.html
+#
+metricbeat.modules:
+{% for module_name, module_settings in metricbeat_combined.modules.items() %}
+  - module: {{ module_name }}
+{% for key, val in module_settings.items() %}
+{% if val is iterable and val is not string %}
+    {{ key }}:
+{% for val2 in val %}
+      - {{ val2 }}
+{% endfor %}
+{% else %}
+    {{ key }}: {{ val }}
+{% endif %}
+{% endfor %}
+{% endfor %}
+
+
+
+
+
+#
+#================================ Outputs =====================================
+#
+# Configure what outputs to use when sending the data collected by the beat.
+# Multiple outputs may be used.
+#
+
+#
+#-------------------------- Elasticsearch output ------------------------------
+#
+# https://www.elastic.co/guide/en/beats/metricbeat/current/elasticsearch-output.html
+#
+{% if 'elasticsearch' in metricbeat_combined.output %}
+output.elasticsearch:
+  # Array of hosts to connect to.
+  hosts: {{ metricbeat_combined.output.elasticsearch.hosts }}
+
+  # Optional protocol and basic auth credentials.
+{% if 'protocol' in metricbeat_combined.output.elasticsearch %}
+  protocol: "{{ metricbeat_combined.output.elasticsearch.protocol }}"
+{% endif %}
+{% if 'username' in metricbeat_combined.output.elasticsearch %}
+  username: "{{ metricbeat_combined.output.elasticsearch.username }}"
+{% endif %}
+{% if 'password' in metricbeat_combined.output.elasticsearch %}
+  password: "{{ metricbeat_combined.output.elasticsearch.password }}"
+{% endif %}
+{% endif %}
+
+#
+#----------------------------- Logstash output --------------------------------
+#
+# https://www.elastic.co/guide/en/beats/metricbeat/current/logstash-output.html
+#
+{% if 'logstash' in metricbeat_combined.output %}
+output.logstash:
+  # The Logstash hosts
+  hosts: {{ metricbeat_combined.output.logstash.hosts }}
+
+  # Optional SSL. By default is off.
+  # List of root certificates for HTTPS server verifications
+{% if 'ssl' in metricbeat_combined.output.logstash %}
+  ssl.certificate_authorities: "{{ metricbeat_combined.output.logstash.ssl.certificate_authorities }}"
+
+  # Certificate for SSL client authentication
+  ssl.certificate: "{{ metricbeat_combined.output.logstash.ssl.certificate }}"
+
+  # Client Certificate Key
+  ssl.key: "{{ metricbeat_combined.output.logstash.ssl.key }}"
+{% endif %}
+{% endif %}
+
+
+
+
+
+#
+#================================ Logging =====================================
+#
+# https://www.elastic.co/guide/en/beats/metricbeat/current/configuration-logging.html
+#
+
+# Sets log level. The default log level is info.
+# Available log levels are: critical, error, warning, info, debug
+{% if 'logging' in metricbeat_combined %}
+logging:
+  level: {{ metricbeat_combined.logging.level }}
+
+  # At debug level, you can selectively enable logging only for some components.
+  # To enable all selectors use ["*"]. Examples of other selectors are "beat",
+  # "publish", "service".
+  selectors: {{ metricbeat_combined.logging.selectors }}
+  to_syslog: {{ metricbeat_combined.logging.to_syslog }}
+  to_files: {{ metricbeat_combined.logging.to_files }}
+{% if 'files' in metricbeat_combined.logging %}
+  files:
+    path: "{{ metricbeat_combined.logging.files.path }}"
+    name: "{{ metricbeat_combined.logging.files.name }}"
+    rotateverybytes: {{ metricbeat_combined.logging.files.rotateeverybytes }}
+    keepfiles: {{ metricbeat_combined.logging.files.keepfiles }}
+{% endif %}
+{% if 'metrics' in metricbeat_combined.logging %}
+  metrics:
+    enabled: {{ metricbeat_combined.logging.metrics.enabled }}
+    period: {{ metricbeat_combined.logging.metrics.period }}
+{% endif %}
+{% endif %}
