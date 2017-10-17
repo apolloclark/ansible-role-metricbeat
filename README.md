@@ -1,6 +1,6 @@
-# Ansible Role: filebeat
+# Ansible Role: metricbeat
 
-Ansible Role to install and configure Elastic metricbeat for Ubuntu.
+Ansible Role to install and configure Elastic Metricbeat for Ubuntu.
 
 
 ## Requirements
