@@ -3,7 +3,7 @@ dependencies: []
 
 galaxy_info:
   author: apolloclark
-  description: Install and configure metricbeat
+  description: Install and configure Elastic Metricbeat
   company: "Apollo Clark"
   license: "license (BSD, MIT)"
   min_ansible_version: 2.2
