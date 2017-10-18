@@ -7,8 +7,7 @@
 # You can find the full configuration reference here:
 # https://www.elastic.co/guide/en/beats/metricbeat/index.html
 
-#
-#================================ General =====================================
+########################### General ########################################
 # 
 # https://www.elastic.co/guide/en/beats/metricbeat/current/configuration-general.html
 #
@@ -59,8 +58,7 @@ max_procs: {{ metricbeat_combined.max_procs }}
 
 
 
-#
-#==========================  Modules configuration ============================
+############################### Modules #######################################
 #
 # https://www.elastic.co/guide/en/beats/metricbeat/current/configuration-metricbeat.html
 #
@@ -83,55 +81,49 @@ metricbeat.modules:
 
 
 
-#
-#================================ Outputs =====================================
+############################# Output ##########################################
 #
 # Configure what outputs to use when sending the data collected by the beat.
 # Multiple outputs may be used.
 #
+output:
 
-#
-#-------------------------- Elasticsearch output ------------------------------
-#
-# https://www.elastic.co/guide/en/beats/metricbeat/current/elasticsearch-output.html
-#
 {% if 'elasticsearch' in metricbeat_combined.output %}
-output.elasticsearch:
-  # Array of hosts to connect to.
-  hosts: {{ metricbeat_combined.output.elasticsearch.hosts }}
+  # https://www.elastic.co/guide/en/beats/metricbeat/current/elasticsearch-output.html
+  elasticsearch:
+    # Array of hosts to connect to.
+    hosts: {{ metricbeat_combined.output.elasticsearch.hosts }}
 
   # Optional protocol and basic auth credentials.
 {% if 'protocol' in metricbeat_combined.output.elasticsearch %}
-  protocol: "{{ metricbeat_combined.output.elasticsearch.protocol }}"
+    protocol: "{{ metricbeat_combined.output.elasticsearch.protocol }}"
 {% endif %}
 {% if 'username' in metricbeat_combined.output.elasticsearch %}
-  username: "{{ metricbeat_combined.output.elasticsearch.username }}"
+    username: "{{ metricbeat_combined.output.elasticsearch.username }}"
 {% endif %}
 {% if 'password' in metricbeat_combined.output.elasticsearch %}
-  password: "{{ metricbeat_combined.output.elasticsearch.password }}"
+    password: "{{ metricbeat_combined.output.elasticsearch.password }}"
 {% endif %}
 {% endif %}
 
-#
-#----------------------------- Logstash output --------------------------------
-#
-# https://www.elastic.co/guide/en/beats/metricbeat/current/logstash-output.html
-#
+
+
 {% if 'logstash' in metricbeat_combined.output %}
-output.logstash:
-  # The Logstash hosts
-  hosts: {{ metricbeat_combined.output.logstash.hosts }}
+  # https://www.elastic.co/guide/en/beats/metricbeat/current/logstash-output.html
+  logstash:
+    # The Logstash hosts
+    hosts: {{ metricbeat_combined.output.logstash.hosts }}
 
-  # Optional SSL. By default is off.
-  # List of root certificates for HTTPS server verifications
+    # Optional SSL. By default is off.
+    # List of root certificates for HTTPS server verifications
 {% if 'ssl' in metricbeat_combined.output.logstash %}
-  ssl.certificate_authorities: "{{ metricbeat_combined.output.logstash.ssl.certificate_authorities }}"
+    ssl.certificate_authorities: "{{ metricbeat_combined.output.logstash.ssl.certificate_authorities }}"
 
-  # Certificate for SSL client authentication
-  ssl.certificate: "{{ metricbeat_combined.output.logstash.ssl.certificate }}"
+    # Certificate for SSL client authentication
+    ssl.certificate: "{{ metricbeat_combined.output.logstash.ssl.certificate }}"
 
-  # Client Certificate Key
-  ssl.key: "{{ metricbeat_combined.output.logstash.ssl.key }}"
+    # Client Certificate Key
+    ssl.key: "{{ metricbeat_combined.output.logstash.ssl.key }}"
 {% endif %}
 {% endif %}
 
@@ -139,31 +131,52 @@ output.logstash:
 
 
 
-#
-#================================ Logging =====================================
+############################# Logging #########################################
 #
 # https://www.elastic.co/guide/en/beats/metricbeat/current/configuration-logging.html
 #
 
-# Sets log level. The default log level is info.
-# Available log levels are: critical, error, warning, info, debug
+# There are three options for the log ouput: syslog, file, stderr.
+# Under Windos systems, the log files are per default sent to the file output,
+# under all other system per default to syslog.
 {% if 'logging' in metricbeat_combined %}
 logging:
+
+  # Sets log level. The default log level is error.
+  # Available log levels are: critical, error, warning, info, debug
   level: {{ metricbeat_combined.logging.level }}
 
-  # At debug level, you can selectively enable logging only for some components.
-  # To enable all selectors use ["*"]. Examples of other selectors are "beat",
-  # "publish", "service".
+  # Enable debug output for selected components. To enable all selectors use ["*"]
+  # Other available selectors are beat, publish, service
+  # Multiple selectors can be chained.
   selectors: {{ metricbeat_combined.logging.selectors }}
+
+  # Send all logging output to syslog. On Windows default is false, otherwise
+  # default is true.
   to_syslog: {{ metricbeat_combined.logging.to_syslog }}
+
+  # Write all logging output to files. Beats automatically rotate files if rotateeverybytes
+  # limit is reached.
   to_files: {{ metricbeat_combined.logging.to_files }}
+  
+  # To enable logging to files, to_files option has to be set to true
 {% if 'files' in metricbeat_combined.logging %}
   files:
+    # The directory where the log files will written to.
     path: "{{ metricbeat_combined.logging.files.path }}"
+
+    # The name of the files where the logs are written to.
     name: "{{ metricbeat_combined.logging.files.name }}"
+
+    # Configure log file size limit. If limit is reached, log file will be
+    # automatically rotated
     rotateverybytes: {{ metricbeat_combined.logging.files.rotateeverybytes }}
+
+    # Number of rotated log files to keep. Oldest files will be deleted first.
     keepfiles: {{ metricbeat_combined.logging.files.keepfiles }}
 {% endif %}
+
+  # Enable metrics recording
 {% if 'metrics' in metricbeat_combined.logging %}
   metrics:
     enabled: {{ metricbeat_combined.logging.metrics.enabled }}
