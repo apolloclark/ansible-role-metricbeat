@@ -40,19 +40,19 @@ fields_under_root: "{{ metricbeat_combined.fields_under_root }}"
 # The internal queue size for single events in the processing pipeline. 
 # The default value is 1000.
 {% if 'queue_size' in metricbeat_combined %}
-queue_size: "{{ metricbeat_combined.queue_size }}"
+queue_size: {{ metricbeat_combined.queue_size }}
 {% endif %}
 
 # (DO NOT TOUCH) The internal queue size for bulk events in the processing
 # pipeline. The default value is 0.
 {% if 'bulk_queue_size' in metricbeat_combined %}
-bulk_queue_size: "{{ metricbeat_combined.bulk_queue_size }}"
+bulk_queue_size: {{ metricbeat_combined.bulk_queue_size }}
 {% endif %}
 
 # Sets the maximum number of CPUs that can be executing simultaneously. The
 # default is the number of logical CPUs available in the system.
-{% if 'max_procs' in metricbeat_combined %}
-max_procs: "{{ metricbeat_combined.max_procs }}"
+{% if 'max_procs' in metricbeat_combined and metricbeat_combined.max_procs %}
+max_procs: {{ metricbeat_combined.max_procs }}
 {% endif %}
 
 
