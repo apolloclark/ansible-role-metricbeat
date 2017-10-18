@@ -16,6 +16,7 @@ galaxy_info:
       - all
   galaxy_tags:
     - monitoring
-    - elk
+    - metrics
     - elastic
+    - elk
     - metricbeat
