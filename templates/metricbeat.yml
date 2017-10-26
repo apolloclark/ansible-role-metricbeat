@@ -12,45 +12,51 @@
 # https://www.elastic.co/guide/en/beats/metricbeat/current/configuration-general.html
 #
 
+{% if 'name' in metricbeat_combined %}
 # The name of the shipper that publishes the network data. It can be used to group
 # all the transactions sent by a single shipper in the web interface. Default
 # is the hostname.
 name: "{{ metricbeat_combined.name }}"
+{% endif %}
 
+{% if 'tags' in metricbeat_combined %}
 # The tags of the shipper are included in their own field with each
 # transaction published.
 tags: "{{ metricbeat_combined.tags }}"
+{% endif %}
 
+{% if 'fields' in metricbeat_combined %}
 # Optional fields that you can specify to add additional information to the
 # output.
 fields:
 {% for field in metricbeat_combined.fields %}
   {{ field }}
 {% endfor %}
+{% endif %}
 
+{% if 'fields_under_root' in metricbeat_combined %}
 # If this option is set to true, the custom fields are stored as top-level
 # fields in the output document instead of being grouped under a fields
 # sub-dictionary. If the custom field names conflict with other field names,
 # then the custom fields overwrite the other fields. The default value is false.
-{% if 'fields_under_root' in metricbeat_combined %}
 fields_under_root: "{{ metricbeat_combined.fields_under_root }}"
 {% endif %}
 
+{% if 'queue_size' in metricbeat_combined %}
 # The internal queue size for single events in the processing pipeline. 
 # The default value is 1000.
-{% if 'queue_size' in metricbeat_combined %}
 queue_size: {{ metricbeat_combined.queue_size }}
 {% endif %}
 
+{% if 'bulk_queue_size' in metricbeat_combined %}
 # (DO NOT TOUCH) The internal queue size for bulk events in the processing
 # pipeline. The default value is 0.
-{% if 'bulk_queue_size' in metricbeat_combined %}
 bulk_queue_size: {{ metricbeat_combined.bulk_queue_size }}
 {% endif %}
 
+{% if 'max_procs' in metricbeat_combined and metricbeat_combined.max_procs %}
 # Sets the maximum number of CPUs that can be executing simultaneously. The
 # default is the number of logical CPUs available in the system.
-{% if 'max_procs' in metricbeat_combined and metricbeat_combined.max_procs %}
 max_procs: {{ metricbeat_combined.max_procs }}
 {% endif %}
 
