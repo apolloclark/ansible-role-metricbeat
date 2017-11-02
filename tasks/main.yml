@@ -17,15 +17,17 @@
   apt_repository:
     repo: 'deb https://artifacts.elastic.co/packages/5.x/apt stable main'
     state: present
+  when: "metricbeat_combined.version == '5.x'"
 
 - name: Update apt cache
   apt: update_cache=yes
+  when: "metricbeat_combined.version == '5.x'"
 
 - name: Install from repo (if choosing the latest version)
   apt:
     name: metricbeat
     state: installed
-  when: "metricbeat_combined.version == 'latest'"
+  when: "metricbeat_combined.version == '5.x'"
 
 - name: Get the platform (i386 or amd64) of the virtual machine
   command: dpkg --print-architecture
@@ -39,11 +41,11 @@
   get_url:
     url={{ elastic_url }}/downloads/beats/metricbeat/metricbeat-{{ metricbeat_combined.version }}-{{ platform }}.deb
     dest=/opt/metricbeat.deb
-  when: "metricbeat_combined.version != 'latest'"
+  when: "metricbeat_combined.version != '5.x'"
 
 - name: Install from deb (if choosing a specific version)
   apt: deb=/opt/metricbeat.deb
-  when: "metricbeat_combined.version != 'latest'"
+  when: "metricbeat_combined.version != '5.x'"
 
 # http://docs.ansible.com/ansible/latest/template_module.html
 - name: Copy config file
@@ -54,3 +56,10 @@
     group: root
     mode: 0644
   notify: restart metricbeat
+  when: "metricbeat_combined.install_only != 'true'"
+
+- name: Restart Metricbeat
+  service:
+    name: "{{ metricbeat_combined.daemon }}"
+    state: restarted
+    sleep: 15

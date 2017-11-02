@@ -8,7 +8,7 @@
 # https://www.elastic.co/guide/en/beats/metricbeat/index.html
 
 ########################### General ########################################
-# 
+#
 # https://www.elastic.co/guide/en/beats/metricbeat/current/configuration-general.html
 #
 
@@ -43,7 +43,7 @@ fields_under_root: "{{ metricbeat_combined.fields_under_root }}"
 {% endif %}
 
 {% if 'queue_size' in metricbeat_combined %}
-# The internal queue size for single events in the processing pipeline. 
+# The internal queue size for single events in the processing pipeline.
 # The default value is 1000.
 queue_size: {{ metricbeat_combined.queue_size }}
 {% endif %}
@@ -95,42 +95,438 @@ metricbeat.modules:
 output:
 
 {% if 'elasticsearch' in metricbeat_combined.output %}
+  #
+  #------------------------- Elasticsearch output -----------------------------
+  #
   # https://www.elastic.co/guide/en/beats/metricbeat/current/elasticsearch-output.html
   elasticsearch:
-    # Array of hosts to connect to.
-    hosts: {{ metricbeat_combined.output.elasticsearch.hosts }}
 
-  # Optional protocol and basic auth credentials.
-{% if 'protocol' in metricbeat_combined.output.elasticsearch %}
-    protocol: "{{ metricbeat_combined.output.elasticsearch.protocol }}"
+{% if 'enabled' in metricbeat_combined.output.elasticsearch %}
+    # The enabled config is a boolean setting to enable or disable the output.
+    # If set to false, the output is disabled.
+    #
+    # The default value is true.
+    enabled: "{{ metricbeat_combined.output.elasticsearch.enabled }}"
 {% endif %}
+
+{% if 'hosts' in metricbeat_combined.output.elasticsearch %}
+    # The list of Elasticsearch nodes to connect to. The events are distributed
+    # to these nodes in round robin order. If one node becomes unreachable, the
+    # event is automatically sent to another node. Each Elasticsearch node can
+    # be defined as a URL or IP:PORT. For example: http://192.15.3.2,
+    # https://es.found.io:9230 or 192.24.3.2:9300. If no port is specified,
+    # 9200 is used.
+    hosts: {{ metricbeat_combined.output.elasticsearch.hosts }}
+{% endif %}
+
+{% if 'compression_level' in metricbeat_combined.output.elasticsearch %}
+    # The gzip compression level. Setting this value to 0 disables compression.
+    # The compression level must be in the range of 1 (best speed) to 9 (best
+    # compression).
+    #
+    # Increasing the compression level will reduce the network usage but will
+    # increase the cpu usage.
+    #
+    # The default value is 0.
+    compression_level: {{ metricbeat_combined.output.elasticsearch.compression_level }}
+{% endif %}
+
+{% if 'worker' in metricbeat_combined.output.elasticsearch %}
+    # The number of workers per configured host publishing events to
+    # Elasticsearch. This is best used with load balancing mode enabled.
+    # Example: If you have 2 hosts and 3 workers, in total 6 workers are
+    # started (3 for each host).
+    worker: {{ metricbeat_combined.output.elasticsearch.worker }}
+{% endif %}
+
 {% if 'username' in metricbeat_combined.output.elasticsearch %}
+    # The basic authentication username for connecting to Elasticsearch.
     username: "{{ metricbeat_combined.output.elasticsearch.username }}"
 {% endif %}
+
 {% if 'password' in metricbeat_combined.output.elasticsearch %}
+    # The basic authentication password for connecting to Elasticsearch.
     password: "{{ metricbeat_combined.output.elasticsearch.password }}"
 {% endif %}
+
+{% if 'parameters' in metricbeat_combined.output.elasticsearch %}
+    # Dictionary of HTTP parameters to pass within the url with index operations.
+    parameters: {{ metricbeat_combined.output.elasticsearch.parameters }}
+{% endif %}
+
+{% if 'protocol' in metricbeat_combined.output.elasticsearch %}
+    # The name of the protocol Elasticsearch is reachable on. The options
+    # are: http or https. The default is http. However, if you specify a URL
+    # for hosts, the value of protocol is overridden by whatever scheme you
+    # specify in the URL.
+    protocol: "{{ metricbeat_combined.output.elasticsearch.protocol }}"
+{% endif %}
+
+{% if 'path' in metricbeat_combined.output.elasticsearch %}
+    # An HTTP path prefix that is prepended to the HTTP API calls. This is
+    # useful for the cases where Elasticsearch listens behind an HTTP reverse
+    # proxy that exports the API under a custom prefix.
+    path: "{{ metricbeat_combined.output.elasticsearch.path }}"
+{% endif %}
+
+{% if 'headers' in metricbeat_combined.output.elasticsearch %}
+    # Custom HTTP headers to add to each request created by the Elasticsearch
+    # output. It is generally possible to specify multiple header values
+    # for the same header name by separating them with a comma.
+    headers: {{ metricbeat_combined.output.elasticsearch.headers }}
+{% endif %}
+
+{% if 'proxy_url' in metricbeat_combined.output.elasticsearch %}
+    # The URL of the proxy to use when connecting to the Elasticsearch servers.
+    # The value may be either a complete URL or a "host[:port]", in which case
+    # the "http" scheme is assumed. If a value is not specified through the
+    # configuration file then proxy environment variables are used. See the
+    # golang documentation for more information about the environment variables.
+    proxy_url: "{{ metricbeat_combined.output.elasticsearch.proxy_url }}"
+{% endif %}
+
+{% if 'index' in metricbeat_combined.output.elasticsearch %}
+    # The index name to write events to. The default is "metricbeat-%{+yyyy.MM.dd}"
+    # (for example, "metricbeat-2015.04.26").
+    index: "{{ metricbeat_combined.output.elasticsearch.index }}"
+{% endif %}
+
+{% if 'indices' in metricbeat_combined.output.elasticsearch %}
+    # Array of index selector rules supporting conditionals, format string based
+    # field access and name mappings. The first rule matching will be used
+    # to set the index for the event to be published. If indices is missing
+    # or no rule matches, the index field will be used.
+    indices: {{ metricbeat_combined.output.elasticsearch.indices }}
+{% endif %}
+
+{% if 'pipeline' in metricbeat_combined.output.elasticsearch %}
+    # A format string value that specifies the ingest node pipeline to write events to.
+    pipeline: "{{ metricbeat_combined.output.elasticsearch.pipeline }}"
+{% endif %}
+
+{% if 'pipelines' in metricbeat_combined.output.elasticsearch %}
+    # Similar to the indices array, this is an array of pipeline selector
+    # configurations supporting conditionals, format string based field access
+    # and name mappings. The first rule matching will be used to set the
+    # pipeline for the event to be published. If pipelines is missing or no
+    # rule matches, the pipeline field will be used.
+    pipelines: {{ metricbeat_combined.output.elasticsearch.pipelines }}
+{% endif %}
+
+{% if 'template' in metricbeat_combined.output.elasticsearch %}
+    # The index template to use for setting mappings in Elasticsearch. By
+    # default, template loading is enabled.
+    template:
+
+{% if 'enabled' in metricbeat_combined.output.elasticsearch.template %}
+      # Set to false to disable template loading. If set this to false, you
+      # must load the template manually.s
+      enabled: "{{ metricbeat_combined.output.elasticsearch.template.enabled }}"
+{% endif %}
+
+{% if 'name' in metricbeat_combined.output.elasticsearch.template %}
+      # The name of the template. The default is metricbeat.
+      name: "{{ metricbeat_combined.output.elasticsearch.template.name }}"
+{% endif %}
+
+{% if 'path' in metricbeat_combined.output.elasticsearch.template %}
+      # The path to the template file. The default is metricbeat.template.json.
+      # If a relative path is set, it is considered relative to the config
+      # path. See the Directory Layout section for details.
+      path: "{{ metricbeat_combined.output.elasticsearch.template.path }}"
+{% endif %}
+
+{% if 'overwrite' in metricbeat_combined.output.elasticsearch.template %}
+      # A boolean that specifies whether to overwrite the existing template.
+      # The default is false.
+      overwrite: "{{ metricbeat_combined.output.elasticsearch.template.overwrite }}"
+{% endif %}
+{% endif %}
+
+{% if 'max_retries' in metricbeat_combined.output.elasticsearch %}
+    # The number of times to retry publishing an event after a publishing
+    # failure. After the specified number of retries, the events are typically
+    # dropped. Some Beats, such as Filebeat, ignore the max_retries setting
+    # and retry until all events are published.
+    #
+    # Set max_retries to a value less than 0 to retry until all events are
+    # published.
+    #
+    # The default is 3.
+    max_retries: {{ metricbeat_combined.output.elasticsearch.max_retries }}
+{% endif %}
+
+{% if 'bulk_max_size' in metricbeat_combined.output.elasticsearch %}
+    # The maximum number of events to bulk in a single Elasticsearch bulk API
+    # index request. The default is 50.
+    #
+    # If the Beat sends single events, the events are collected into batches.
+    # If the Beat publishes a large batch of events (larger than the value
+    # specified by bulk_max_size), the batch is split.
+    #
+    # Specifying a larger batch size can improve performance by lowering the
+    # overhead of sending events. However big batch sizes can also increase
+    # processing times, which might result in API errors, killed connections,
+    # timed-out publishing requests, and, ultimately, lower throughput.
+    #
+    # Setting bulk_max_size to values less than or equal to 0 disables buffering
+    # in libbeat. When buffering is disabled, Beats that publish single events
+    # (such as Packetbeat) send each event directly to Elasticsearch. Beats
+    # that publish data in batches (such as Filebeat) send events in batches
+    # based on the spooler size.
+    bulk_max_size: {{ metricbeat_combined.output.elasticsearch.bulk_max_size }}
+{% endif %}
+
+{% if 'timeout' in metricbeat_combined.output.elasticsearch %}
+    # The http request timeout in seconds for the Elasticsearch request.
+    # The default is 90.
+    timeout: {{ metricbeat_combined.output.elasticsearch.timeout }}
+{% endif %}
+
+{% if 'flush_interval' in metricbeat_combined.output.elasticsearch %}
+    # The number of seconds to wait for new events between two bulk API index
+    # requests. If bulk_max_size is reached before this interval expires,
+    # additional bulk index requests are made.
+    flush_interval: {{ metricbeat_combined.output.elasticsearch.flush_interval }}
+{% endif %}
+
+{% if 'ssl' in metricbeat_combined.output.elasticsearch %}
+    # https://www.elastic.co/guide/en/beats/metricbeat/current/configuration-output-ssl.html
+    # ssl:
+      # certificate_authorities: ["/etc/pki/root/ca.pem"]
+      # certificate: "/etc/pki/client/cert.pem"
+      # key: "/etc/pki/client/cert.key"
+{% endif %}
+
 {% endif %}
 
 
 
 {% if 'logstash' in metricbeat_combined.output %}
+  #
+  #------------------------- Logstash output -----------------------------
+  #
   # https://www.elastic.co/guide/en/beats/metricbeat/current/logstash-output.html
   logstash:
-    # The Logstash hosts
+
+{% if 'enabled' in metricbeat_combined.output.logstash %}
+    # The enabled config is a boolean setting to enable or disable the output.
+    # If set to false, the output is disabled.
+    #
+    # The default value is true.
+    enabled: "{{ metricbeat_combined.output.logstash.enabled }}"
+{% endif %}
+
+    # The list of known Logstash servers to connect to. If load balancing is
+    # disabled, but mutliple hosts are configured, one host is selected randomly
+    # (there is no precedence). If one host becomes unreachable, another one
+    # is selected randomly.
+    #
+    # All entries in this list can contain a port number. If no port number is
+    # given, the value specified for port is used as the default port number.
     hosts: {{ metricbeat_combined.output.logstash.hosts }}
 
-    # Optional SSL. By default is off.
-    # List of root certificates for HTTPS server verifications
-{% if 'ssl' in metricbeat_combined.output.logstash %}
-    ssl.certificate_authorities: "{{ metricbeat_combined.output.logstash.ssl.certificate_authorities }}"
-
-    # Certificate for SSL client authentication
-    ssl.certificate: "{{ metricbeat_combined.output.logstash.ssl.certificate }}"
-
-    # Client Certificate Key
-    ssl.key: "{{ metricbeat_combined.output.logstash.ssl.key }}"
+{% if 'compression_level' in metricbeat_combined.output.logstash %}
+    # The gzip compression level. Setting this value to 0 disables compression.
+    # The compression level must be in the range of 1 (best speed) to 9 (best
+    # compression).
+    #
+    # Increasing the compression level will reduce the network usage but will
+    # increase the cpu usage.
+    #
+    # The default value is 3.
+    compression_level: {{ metricbeat_combined.output.logstash.compression_level }}
 {% endif %}
+
+{% if 'worker' in metricbeat_combined.output.logstash %}
+    # The number of workers per configured host publishing events to Logstash.
+    # This is best used with load balancing mode enabled. Example: If you have
+    # 2 hosts and 3 workers, in total 6 workers are started (3 for each host).
+    worker: {{ metricbeat_combined.output.logstash.worker }}
+{% endif %}
+
+{% if 'loadbalance' in metricbeat_combined.output.logstash %}
+    # If set to true and multiple Logstash hosts are configured, the output
+    # plugin load balances published events onto all Logstash hosts. If set to
+    # false, the output plugin sends all events to only one host (determined
+    # at random) and will switch to another host if the selected one becomes
+    # unresponsive.
+    #
+    # The default value is false.
+    loadbalance: "{{ metricbeat_combined.output.logstash.loadbalance }}"
+{% endif %}
+
+{% if 'pipelining' in metricbeat_combined.output.logstash %}
+    # Configures number of batches to be send asynchronously to logstash while
+    # waiting for ACK from logstash. Output only becomes blocking once number
+    # of pipelining batches have been written. Pipelining is disabled if a
+    # values of 0 is configured.
+    #
+    # The default value is 0.
+    pipelining: {{ metricbeat_combined.output.logstash.pipelining }}
+{% endif %}
+
+{% if 'proxy_url' in metricbeat_combined.output.logstash %}
+    # The URL of the SOCKS5 proxy to use when connecting to the Logstash servers.
+    # The value must be a URL with a scheme of socks5://. The protocol used
+    # to communicate to Logstash is not based on HTTP so a web-proxy cannot
+    # be used.
+    #
+    # If the SOCKS5 proxy server requires client authentication, then a
+    # username and password can be embedded in the URL as shown in the example.
+    #
+    # When using a proxy, hostnames are resolved on the proxy server instead of
+    # on the client. You can change this behavior by setting the
+    # proxy_use_local_resolver option.
+    proxy_url: "{{ metricbeat_combined.output.logstash.proxy_url }}"
+{% endif %}
+
+{% if 'proxy_use_local_resolver' in metricbeat_combined.output.logstash %}
+    # The proxy_use_local_resolver option determines if Logstash hostnames are
+    # resolved locally when using a proxy. The default value is false which
+    # means that when a proxy is used the name resolution occurs on the proxy
+    # server.
+    proxy_use_local_resolver: "{{ metricbeat_combined.output.logstash.proxy_use_local_resolver }}"
+{% endif %}
+
+{% if 'index' in metricbeat_combined.output.logstash %}
+    # Optional index name. The default index name depends on the each beat.
+    # For Packetbeat, the default is set to packetbeat, for Topbeat
+    # top topbeat and for Filebeat to filebeat.
+    index: "{{ metricbeat_combined.output.logstash.index }}"
+{% endif %}
+
+{% if 'ssl' in metricbeat_combined.output.logstash %}
+    # https://www.elastic.co/guide/en/beats/metricbeat/current/configuration-output-ssl.html
+    # ssl:
+      # certificate_authorities: ["/etc/pki/root/ca.pem"]
+      # certificate: "/etc/pki/client/cert.pem"
+      # key: "/etc/pki/client/cert.key"
+{% endif %}
+
+{% if 'timeout' in metricbeat_combined.output.logstash %}
+    # The number of seconds to wait for responses from the Logstash server
+    # before timing out.
+    #
+    # The default is 30 (seconds).
+    timeout: {{ metricbeat_combined.output.logstash.timeout }}
+{% endif %}
+
+{% if 'max_retries' in metricbeat_combined.output.logstash %}
+    # The number of times to retry publishing an event after a publishing
+    # failure. After the specified number of retries, the events are
+    # typically dropped. Some Beats, such as Filebeat, ignore the max_retries
+    # setting and retry until all events are published.
+    #
+    # Set max_retries to a value less than 0 to retry until all events are published.
+    #
+    # The default is 3.
+    max_retries: {{ metricbeat_combined.output.logstash.max_retries }}
+{% endif %}
+
+{% if 'bulk_max_size' in metricbeat_combined.output.logstash %}
+    # The maximum number of events to bulk in a single Logstash request.
+    #
+    # The default is 2048.
+    #
+    # If the Beat sends single events, the events are collected into batches.
+    # If the Beat publishes a large batch of events (larger than the value
+    # specified by bulk_max_size), the batch is split.
+    #
+    # Specifying a larger batch size can improve performance by lowering the
+    # overhead of sending events. However big batch sizes can also increase
+    # processing times, which might result in API errors, killed connections,
+    # timed-out publishing requests, and, ultimately, lower throughput.
+    #
+    # Setting bulk_max_size to values less than or equal to 0 disables
+    # buffering in libbeat. When buffering is disabled, Beats that publish
+    # single events (such as Packetbeat) send each event directly to
+    # Elasticsearch. Beats that publish data in batches (such as Filebeat)
+    # send events in batches based on the spooler size.
+    bulk_max_size: {{ metricbeat_combined.output.logstash.bulk_max_size }}
+{% endif %}
+
+{% if 'slow_start' in metricbeat_combined.output.logstash %}
+    # If enabled only a subset of events in a batch of events is transferred
+    # per transaction. The number of events to be sent increases up to
+    # bulk_max_size if no error is encountered. On error the number of events
+    # per transaction is reduced again.
+    #
+    # The default is false.
+    slow_start: "{{ metricbeat_combined.output.logstash.slow_start }}"
+{% endif %}
+
+{% endif %}
+
+
+
+{% if 'file' in metricbeat_combined.output %}
+  #
+  #------------------------- File output -----------------------------
+  #
+  # https://www.elastic.co/guide/en/beats/metricbeat/current/file-output.html
+  file:
+    # Enabled this?
+    enabled: "{{ metricbeat_combined.output.file.enabled }}"
+
+    # Path to the directory where to save the generated files. The option is mandatory.
+    path: "{{ metricbeat_combined.output.file.path }}"
+
+{% if 'filename' in metricbeat_combined.output.file %}
+    # Name of the generated files. The default is `metricbeat` and it generates files: `metricbeat`, `metricbeat.1`, `metricbeat.2`, etc.
+    filename: "{{ metricbeat_combined.output.file.filename }}"
+{% endif %}
+
+{% if 'rotate_every_kb' in metricbeat_combined.output.file %}
+    # Maximum size in kilobytes of each file. When this size is reached, the files are
+    # rotated. The default value is 10 MB.
+    rotate_every_kb: {{ metricbeat_combined.output.file.rotate_every_kb }}
+{% endif %}
+
+{% if 'number_of_files' in metricbeat_combined.output.file %}
+    # Maximum number of files under path. When this number of files is reached, the
+    # oldest file is deleted and the rest are shifted from last to first. The default
+    # is 7 files.
+    number_of_files: {{ metricbeat_combined.output.file.number_of_files }}
+{% endif %}
+{% endif %}
+
+
+
+{% if 'console' in metricbeat_combined.output %}
+  #
+  #------------------------- Console output -----------------------------
+  #
+  # https://www.elastic.co/guide/en/beats/metricbeat/current/console-output.html
+  console:
+{% if 'enabled' in metricbeat_combined.output.console %}
+    # The enabled config is a boolean setting to enable or disable the output.
+    # If set to false, the output is disabled.
+    #
+    # The default value is true.
+    enabled: "{{ metricbeat_combined.output.console.enabled }}"
+{% endif %}
+
+{% if 'pretty' in metricbeat_combined.output.console %}
+    # If pretty is set to true, events written to stdout will be nicely formatted.
+    #
+    # The default is false.
+    pretty: "{{ metricbeat_combined.output.console.pretty }}"
+{% endif %}
+
+{% if 'bulk_max_size' in metricbeat_combined.output.console %}
+    # The maximum number of events to buffer internally during publishing.
+    #
+    # The default is 2048.
+    #
+    # Specifying a larger batch size may add some latency and buffering during
+    # publishing. However, for Console output, this setting does not affect how
+    # events are published.
+    #
+    # Setting bulk_max_size to 0 disables buffering in libbeat.
+    bulk_max_size: {{ metricbeat_combined.output.console.bulk_max_size }}
+{% endif %}
+
 {% endif %}
 
 
@@ -159,12 +555,12 @@ logging:
 
   # Send all logging output to syslog. On Windows default is false, otherwise
   # default is true.
-  to_syslog: {{ metricbeat_combined.logging.to_syslog }}
+  to_syslog: "{{ metricbeat_combined.logging.to_syslog }}"
 
   # Write all logging output to files. Beats automatically rotate files if rotateeverybytes
   # limit is reached.
-  to_files: {{ metricbeat_combined.logging.to_files }}
-  
+  to_files: "{{ metricbeat_combined.logging.to_files }}"
+
   # To enable logging to files, to_files option has to be set to true
 {% if 'files' in metricbeat_combined.logging %}
   files:
@@ -185,7 +581,7 @@ logging:
   # Enable metrics recording
 {% if 'metrics' in metricbeat_combined.logging %}
   metrics:
-    enabled: {{ metricbeat_combined.logging.metrics.enabled }}
+    enabled: "{{ metricbeat_combined.logging.metrics.enabled }}"
     period: {{ metricbeat_combined.logging.metrics.period }}
 {% endif %}
 {% endif %}
