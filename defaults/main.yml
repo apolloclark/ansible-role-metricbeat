@@ -47,7 +47,7 @@ metricbeat_defaults:
   output:
     # https://www.elastic.co/guide/en/beats/metricbeat/current/elasticsearch-output.html
     elasticsearch:
-      enabled: "true"
+      enabled: "false"
       hosts: ""
       compression_level: 0
       worker: 1
