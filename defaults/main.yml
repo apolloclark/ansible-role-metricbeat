@@ -86,7 +86,7 @@ metricbeat_defaults:
 
     # https://www.elastic.co/guide/en/beats/metricbeat/current/logstash-output.html
     logstash:
-      enabled: "false"
+      enabled: "true"
       hosts: '["localhost:5044"]'
       compression_level: 3
       worker: 1
