@@ -47,6 +47,12 @@
   apt: deb=/opt/metricbeat.deb
   when: "metricbeat_combined.version != '5.x'"
 
+# http://docs.ansible.com/ansible/latest/service_module.html
+- name: Make sure Metricbeat autostarts
+  service:
+    name: metricbeat
+    enabled: yes
+
 # http://docs.ansible.com/ansible/latest/template_module.html
 - name: Copy config file
   template:
