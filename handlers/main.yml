@@ -1,6 +1,0 @@
----
-- name: restart metricbeat
-  service:
-    name: "{{ metricbeat_combined.daemon }}"
-    state: restarted
-    sleep: 5
