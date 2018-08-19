@@ -104,7 +104,7 @@
 # https://docs.ansible.com/ansible/latest/modules/command_module.html
 # https://www.elastic.co/guide/en/beats/metricbeat/6.2/configuration-template.html
 - name: Configure the Elasticsearch index template
-  command: metricbeat setup --template -E output.logstash.enabled=false -E output.elasticsearch.enabled=true -E 'output.elasticsearch.hosts=["{{ item }}"]'
+  command: metricbeat setup --template -E output.logstash.enabled=false -E output.kafka.enabled=false -E output.elasticsearch.enabled=true -E 'output.elasticsearch.hosts=["{{ item }}"]'
   loop: "{{ metricbeat_combined.output.elasticsearch.hosts }}"
   when:
     - metricbeat_combined.setup.template.enabled
