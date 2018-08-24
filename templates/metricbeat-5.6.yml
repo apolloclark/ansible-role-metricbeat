@@ -62,8 +62,6 @@ max_procs: {{ metricbeat_combined.max_procs }}
 
 
 
-
-
 ############################### Modules #######################################
 #
 # https://www.elastic.co/guide/en/beats/metricbeat/current/configuration-metricbeat.html
@@ -82,8 +80,6 @@ metricbeat.modules:
 {% endif %}
 {% endfor %}
 {% endfor %}
-
-
 
 
 
@@ -526,10 +522,7 @@ output:
     # Setting bulk_max_size to 0 disables buffering in libbeat.
     bulk_max_size: {{ metricbeat_combined.output.console.bulk_max_size }}
 {% endif %}
-
 {% endif %}
-
-
 
 
 
