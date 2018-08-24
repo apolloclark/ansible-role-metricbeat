@@ -6,4 +6,4 @@ elastic_url: "https://artifacts.elastic.co"
 
 # Overload variables using the dict named metricbeat
 metricbeat:
-  version: "6.3.0"
+  version: "6.4.0"

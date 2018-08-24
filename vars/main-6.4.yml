@@ -2,12 +2,12 @@
 
 metricbeat_defaults:
   daemon: "metricbeat"
-  version: "6.3.0"
+  version: "6.4.0"
   config_include_dir: "/etc/metricbeat/"
   install_only: false
   install_repo: true
 
-  # https://www.elastic.co/guide/en/beats/metricbeat/6.3/configuration-general.html
+  # https://www.elastic.co/guide/en/beats/metricbeat/6.4/configuration-general.html
   name: ""
   tags: ""
   fields: []
@@ -16,10 +16,10 @@ metricbeat_defaults:
   bulk_queue_size: 0
   max_procs: ""
 
-  # https://www.elastic.co/guide/en/beats/metricbeat/6.3/configuring-howto-metricbeat.html
-  # https://www.elastic.co/guide/en/beats/metricbeat/6.3/metricbeat-modules.html
+  # https://www.elastic.co/guide/en/beats/metricbeat/6.4/configuring-howto-metricbeat.html
+  # https://www.elastic.co/guide/en/beats/metricbeat/6.4/metricbeat-modules.html
   modules:
-  # https://www.elastic.co/guide/en/beats/metricbeat/6.3/metricbeat-module-system.html
+  # https://www.elastic.co/guide/en/beats/metricbeat/6.4/metricbeat-module-system.html
     system:
       metricsets:
         - cpu
@@ -37,7 +37,7 @@ metricbeat_defaults:
       processes: "['.*']"
       cpu_ticks: true
  
-  # https://www.elastic.co/guide/en/beats/metricbeat/6.3/configuration-processes.html
+  # https://www.elastic.co/guide/en/beats/metricbeat/6.4/configuration-processes.html
   # procs:
     #  enabled: false
     #  monitored:
@@ -54,7 +54,7 @@ metricbeat_defaults:
     #      cmdline_grep: gunicorn
 
   output:
-    # https://www.elastic.co/guide/en/beats/metricbeat/6.3/elasticsearch-output.html
+    # https://www.elastic.co/guide/en/beats/metricbeat/6.4/elasticsearch-output.html
     elasticsearch:
       enabled: false
       hosts:
@@ -77,7 +77,7 @@ metricbeat_defaults:
       timeout: 90
       ssl: []
 
-    # https://www.elastic.co/guide/en/beats/metricbeat/6.3/logstash-output.html
+    # https://www.elastic.co/guide/en/beats/metricbeat/6.4/logstash-output.html
     logstash:
       enabled: false
       hosts:
@@ -96,7 +96,7 @@ metricbeat_defaults:
       proxy_use_local_resolver: false
       ssl: []
 
-    # https://www.elastic.co/guide/en/beats/metricbeat/6.3/kafka-output.html
+    # https://www.elastic.co/guide/en/beats/metricbeat/6.4/kafka-output.html
     kafka:
       enabled: false
       hosts:
@@ -130,7 +130,7 @@ metricbeat_defaults:
       
     redis: []
 
-    # https://www.elastic.co/guide/en/beats/metricbeat/6.3/file-output.html
+    # https://www.elastic.co/guide/en/beats/metricbeat/6.4/file-output.html
     file:
       enabled: false
       path: "/tmp/metricbeat"
@@ -138,13 +138,13 @@ metricbeat_defaults:
       rotate_every_kb: 10240
       number_of_files: 7
 
-    # https://www.elastic.co/guide/en/beats/metricbeat/6.3/console-output.html
+    # https://www.elastic.co/guide/en/beats/metricbeat/6.4/console-output.html
     console:
       enabled: false
       pretty: false
       bulk_max_size: 2048
 
-  # https://www.elastic.co/guide/en/beats/metricbeat/6.3/configuration-path.html
+  # https://www.elastic.co/guide/en/beats/metricbeat/6.4/configuration-path.html
   paths:
     home: ""
     config: ""
@@ -152,7 +152,7 @@ metricbeat_defaults:
     logs: ""
 
   setup:
-    # https://www.elastic.co/guide/en/beats/metricbeat/6.3/configuration-dashboards.html
+    # https://www.elastic.co/guide/en/beats/metricbeat/6.4/configuration-dashboards.html
     dashboards:
       enabled: false
       directory: '${path.home}/kibana'
@@ -164,7 +164,7 @@ metricbeat_defaults:
       always_kibana: true
       retry.enabled: true
 
-    # https://www.elastic.co/guide/en/beats/metricbeat/6.3/configuration-template.html
+    # https://www.elastic.co/guide/en/beats/metricbeat/6.4/configuration-template.html
     template:
       enabled: false
       name: "metricbeat"
@@ -173,7 +173,7 @@ metricbeat_defaults:
       overwrite: false
       settings: []
 
-    # https://www.elastic.co/guide/en/beats/metricbeat/6.3/setup-kibana-endpoint.html
+    # https://www.elastic.co/guide/en/beats/metricbeat/6.4/setup-kibana-endpoint.html
     kibana:
       host: "127.0.0.1:5601"
       protocol: "http"
@@ -182,7 +182,7 @@ metricbeat_defaults:
       path: ""
       ssl: []
 
-  # https://www.elastic.co/guide/en/beats/metricbeat/6.3/configuration-logging.html
+  # https://www.elastic.co/guide/en/beats/metricbeat/6.4/configuration-logging.html
   logging:
     level: "info"
     selectors: '["*"]'
