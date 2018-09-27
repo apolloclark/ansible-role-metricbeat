@@ -2,6 +2,7 @@
 dependencies: []
 
 galaxy_info:
+  role_name: metricbeat
   author: apolloclark
   description: Install and configure Elastic Metricbeat
   company: "Apollo Clark"
