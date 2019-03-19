@@ -13,7 +13,7 @@ Available variables are listed below, along with default values (see `defaults/m
 You can overload the variables by creating a dictionary called "metricbeat", ex:
 
     metricbeat:
-      version: 5.6.2
+      version: 6.6.2
 
 ## Dependencies
 
